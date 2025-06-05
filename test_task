@@ -1,0 +1,37 @@
+using System;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        int[] list = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
+        Func(list);
+    }
+
+    static void Func(int[] list)
+    {
+        Array.Sort(list);
+        int res = 0;
+        double median;
+
+        if (list.Length % 2 == 0)
+        {
+            int half = list.Length / 2 - 1;
+            median = (list[half] + list[half + 1]) / 2.0;
+        }
+        else
+        {
+            int half = list.Length / 2;
+            median = list[half];
+        }
+
+        for (int i = 0; i < list.Length; i++)
+        {
+            res += Math.Abs(list[i] - (int)median);
+        }
+
+        Console.WriteLine(res - 1);
+    }
+}
+
