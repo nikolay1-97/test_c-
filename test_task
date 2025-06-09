@@ -5,33 +5,67 @@ class Program
 {
     static void Main()
     {
-        int[] list = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
-        Func(list);
+        int[] ls = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
+        Func(ls);
     }
 
-    static void Func(int[] list)
+    static void Func(int[] ls)
     {
-        Array.Sort(list);
-        int res = 0;
+        Array.Sort(ls);
+        int half = ls.Length / 2;
         double median;
 
-        if (list.Length % 2 == 0)
+        if (ls.Length % 2 == 0)
         {
-            int half = list.Length / 2 - 1;
-            median = (list[half] + list[half + 1]) / 2.0;
+            half -= 1;
+            median = (ls[half] + ls[half + 1]) / 2.0;
         }
         else
         {
-            int half = list.Length / 2;
-            median = list[half];
+            median = ls[half];
         }
 
-        for (int i = 0; i < list.Length; i++)
+        int res = 0;
+        int cnt = 0;
+
+        while (true)
         {
-            res += Math.Abs(list[i] - (int)median);
+            if (cnt == 1)
+            {
+                break;
+            }
+            cnt += 1;
+
+            for (int i = 0; i < ls.Length; i++)
+            {
+                int indexMaxElem = Array.IndexOf(ls, ls.Max());
+                if (ls[i] >= median)
+                {
+                    continue;
+                }
+                if (i == 0)
+                {
+                    res += 1;
+                    ls[i] += 1;
+                    ls[indexMaxElem] -= 1;
+                }
+                else
+                {
+                    res += Math.Abs(i - indexMaxElem);
+                    ls[i] += 1;
+                    ls[indexMaxElem] -= Math.Abs(i - indexMaxElem);
+                }
+            }
         }
 
-        Console.WriteLine(res - 1);
+        for (int i = 0; i < ls.Length; i++)
+        {
+            if (ls[i] > median)
+            {
+                res += (int)Math.Abs(median - ls[i]);
+            }
+        }
+        Console.WriteLine(res);
     }
 }
 
