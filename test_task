@@ -6,21 +6,24 @@ class Program
     static void Main()
     {
         int[] a = Console.ReadLine().Split().Select(int.Parse).ToArray();
-        f(a);
+        F(a);
     }
 
     // проверяет равное ли количество фишек у игроков
     static bool IsEqual(int[] ls)
     {
-        for (int i = 0; i < ls.Length - 1; i++)
+        int val = ls[0];
+        for (int i = 0; i < ls.Length; i++)
         {
-            if (ls[i] != ls[i + 1])
+            if (ls[i] != val)
+            {
                 return false;
+            }
         }
         return true;
     }
 
-    static void f(int[] ls)
+    static void F(int[] ls)
     {
         int res = 0;
         double targetValue = ls.Average();
@@ -29,16 +32,20 @@ class Program
 
         while (true)
         {
+            Console.WriteLine($"шаг1: {string.Join(", ", ls)}");
             bool isEq = IsEqual(ls);
             if (isEq)
+            {
                 break;
+            }
 
             for (int i = 0; i < ls.Length; i++)
             {
                 isEq = IsEqual(ls);
                 if (isEq)
+                {
                     break;
-
+                }
                 if (ls[i] < targetValue)
                 {
                     lessIndex = i;
@@ -46,17 +53,19 @@ class Program
                 if (ls[i] > targetValue)
                 {
                     higherIndex = i;
-                    ls[lessIndex]++;
-                    ls[higherIndex]--;
-
-                    int diff1 = Math.Abs((higherIndex + 1) - (lessIndex + 1));
-                    int diff2 = Math.Abs(ls.Length - (higherIndex + 1)) + (lessIndex + 1);
-                    int diff3 = (higherIndex + 1) + Math.Abs(ls.Length - (lessIndex + 1));
-                    // минимальное количество ходов
-                    int minValue = Math.Min(Math.Min(diff1, diff2), diff3);
-                    res += minValue;
                 }
             }
+
+            ls[lessIndex] += 1;
+            ls[higherIndex] -= 1;
+
+            int diff1 = Math.Abs((higherIndex + 1) - (lessIndex + 1));
+            int diff2 = Math.Abs(ls.Length - (higherIndex + 1)) + (lessIndex + 1);
+            int diff3 = (higherIndex + 1) + Math.Abs(ls.Length - (lessIndex + 1));
+
+            // минимальное количество ходов
+            int minValue = Math.Min(diff1, Math.Min(diff2, diff3));
+            res += minValue;
         }
         Console.WriteLine(res);
     }
