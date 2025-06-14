@@ -1,19 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 class Program
 {
     static void Main()
     {
-        int[] a = Console.ReadLine().Split().Select(int.Parse).ToArray();
-        F(a);
+        var a = Console.ReadLine().Split().Select(int.Parse).ToList();
+        FindMinMoves(a);
     }
 
     // проверяет равное ли количество фишек у игроков
-    static bool IsEqual(int[] ls)
+    static bool IsEqual(List<int> ls)
     {
         int val = ls[0];
-        for (int i = 0; i < ls.Length; i++)
+        for (int i = 0; i < ls.Count; i++)
         {
             if (ls[i] != val)
             {
@@ -23,23 +24,33 @@ class Program
         return true;
     }
 
-    static void F(int[] ls)
+    static void FindMinMoves(List<int> ls)
     {
         int res = 0;
         double targetValue = ls.Average();
-        int lessIndex = 0;
-        int higherIndex = 0;
+        int minMoves = 0;
+        int minMoves2 = 0;
+        List<int> indxOfLess = new List<int>();
+        List<int> indxOfLarge = new List<int>();
+        int indexOfLess = 0;
+        int indexOfLarge = 0;
+        int cnt = 1;
 
         while (true)
         {
-            Console.WriteLine($"шаг1: {string.Join(", ", ls)}");
+            if (cnt > 20)
+            {
+                break;
+            }
+            Console.WriteLine($"шаг{cnt}: {string.Join(", ", ls)}");
+            cnt++;
             bool isEq = IsEqual(ls);
             if (isEq)
             {
                 break;
             }
 
-            for (int i = 0; i < ls.Length; i++)
+            for (int i = 0; i < ls.Count; i++)
             {
                 isEq = IsEqual(ls);
                 if (isEq)
@@ -48,26 +59,44 @@ class Program
                 }
                 if (ls[i] < targetValue)
                 {
-                    lessIndex = i;
+                    indxOfLess.Add(i);
                 }
                 if (ls[i] > targetValue)
                 {
-                    higherIndex = i;
+                    indxOfLarge.Add(i);
                 }
             }
 
-            ls[lessIndex] += 1;
-            ls[higherIndex] -= 1;
+            int diff1 = Math.Abs((indxOfLarge[0] + 1) - (indxOfLess[0] + 1));
+            int diff2 = Math.Abs(ls.Count - (indxOfLarge[0] + 1)) + (indxOfLess[0] + 1);
+            int diff3 = (indxOfLarge[0] + 1) + Math.Abs(ls.Count - (indxOfLess[0] + 1));
+            minMoves = Math.Min(diff1, Math.Min(diff2, diff3));
 
-            int diff1 = Math.Abs((higherIndex + 1) - (lessIndex + 1));
-            int diff2 = Math.Abs(ls.Length - (higherIndex + 1)) + (lessIndex + 1);
-            int diff3 = (higherIndex + 1) + Math.Abs(ls.Length - (lessIndex + 1));
+            for (int i = 0; i < indxOfLarge.Count; i++)
+            {
+                for (int j = 0; j < indxOfLess.Count; j++)
+                {
+                    diff1 = Math.Abs((indxOfLarge[i] + 1) - (indxOfLess[j] + 1));
+                    diff2 = Math.Abs(ls.Count - (indxOfLarge[i] + 1)) + (indxOfLess[j] + 1);
+                    diff3 = (indxOfLarge[i] + 1) + Math.Abs(ls.Count - (indxOfLess[j] + 1));
+                    minMoves2 = Math.Min(diff1, Math.Min(diff2, diff3));
+                    if (minMoves2 <= minMoves)
+                    {
+                        minMoves = minMoves2;
+                        indexOfLess = indxOfLess[j];
+                        indexOfLarge = indxOfLarge[i];
+                    }
+                }
+            }
 
-            // минимальное количество ходов
-            int minValue = Math.Min(diff1, Math.Min(diff2, diff3));
-            res += minValue;
+            res += minMoves;
+            ls[indexOfLess]++;
+            ls[indexOfLarge]--;
+            indxOfLess.Clear();
+            indxOfLarge.Clear();
         }
-        Console.WriteLine(res);
+
+        Console.WriteLine($"минимальное число ходов: {res}");
     }
 }
 
